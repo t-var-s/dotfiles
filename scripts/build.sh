@@ -48,6 +48,7 @@ cleanup() {
 trap cleanup EXIT
 
 ids='|'
+revision_sources=(scripts/build.sh installer/install.sh installer/restore.sh installer/manifest.tsv)
 while IFS=$'\t' read -r id source destination validator minimum extra || [ -n "$id" ]; do
   case "$id" in ''|\#*) continue ;; esac
   [[ "$id" =~ ^[a-zA-Z0-9_-]+$ ]] || fail "Invalid id: $id"
@@ -70,12 +71,15 @@ while IFS=$'\t' read -r id source destination validator minimum extra || [ -n "$
   [ ! -s "$source" ] || [ -z "$(tail -c 1 "$source")" ] || fail "$source must end in a newline"
   [ "$(tr -d '\000' < "$source" | wc -c)" -eq "$(wc -c < "$source")" ] || fail "$source contains NUL bytes"
   ids="$ids$id|"
+  revision_sources+=("$source")
   printf '%s\t%s\t%s\t%s\t%s\n' "$id" "$source" "$destination" "$validator" "$minimum" >> "$build_tmp/manifest.tsv"
 done < installer/manifest.tsv
 [ -s "$build_tmp/manifest.tsv" ] || fail 'Manifest contains no files'
 
 revision=$(git rev-parse --short=12 HEAD 2>/dev/null || printf unknown)
-if [ -n "$(git status --porcelain --untracked-files=normal 2>/dev/null)" ]; then revision="$revision-dirty"; fi
+# Netlify may create unrelated build-service files in the checkout. Only input
+# files that contribute to this installer should affect its dirty suffix.
+if [ -n "$(git status --porcelain --untracked-files=all -- "${revision_sources[@]}" 2>/dev/null)" ]; then revision="$revision-dirty"; fi
 
 emit_file() {
   local input=$1 marker=$2

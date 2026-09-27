@@ -3,7 +3,9 @@
 The repository publishes a self-contained Bash installer and independent web
 assets through Netlify. `main` supplies the latest successful deployment; there
 is no release pin. The generated installer reports a Git revision, with a
-`-dirty` suffix for local worktree changes.
+`-dirty` suffix for changes to the installer templates, manifest, build script,
+or manifest-listed payloads. Unrelated generated build-service files do not
+affect the installer revision label.
 
 `installer/manifest.tsv` is the explicit installation boundary. It maps IDs and
 repository sources to paths below the current user's canonical home directory,

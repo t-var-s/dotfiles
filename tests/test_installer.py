@@ -91,6 +91,11 @@ class InstallerTests(unittest.TestCase):
         for directory in ("installer", "scripts"):
             shutil.copytree(ROOT / directory, cls.project / directory)
         subprocess.run(["git", "init", "-q", str(cls.project)], check=True)
+        subprocess.run(["git", "add", ".gitignore", ".vimrc", ".tmux.conf", "installer", "scripts"],
+                       cwd=cls.project, check=True)
+        subprocess.run(["git", "-c", "user.name=Installer Test", "-c", "user.email=installer-test@example.invalid",
+                        "-c", "commit.gpgsign=false", "commit", "-qm", "Fixture sources"],
+                       cwd=cls.project, check=True)
         cls.build()
 
     @classmethod
@@ -357,6 +362,24 @@ class InstallerTests(unittest.TestCase):
             self.assertEqual((self.project / "dist/install.sh").read_bytes(), original)
         finally:
             saved.rename(sentinel)
+
+    def test_build_revision_tracks_only_installer_inputs(self):
+        generated = self.project / ".netlify"
+        generated.mkdir(exist_ok=True)
+        (generated / "generated-state.json").write_text("{}\n")
+        source = self.project / ".vimrc"
+        original = source.read_bytes()
+        try:
+            self.build()
+            revision = (self.project / "dist/install.sh").read_text().splitlines()[2]
+            self.assertNotIn("-dirty", revision)
+            source.write_bytes(original + b'" local change\n')
+            self.build()
+            revision = (self.project / "dist/install.sh").read_text().splitlines()[2]
+            self.assertTrue(revision.endswith("-dirty"), revision)
+        finally:
+            source.write_bytes(original)
+            self.build()
 
     def test_manifest_rejects_traversal_duplicates_and_overlap(self):
         manifest = self.project / "installer/manifest.tsv"

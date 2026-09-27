@@ -1,4 +1,6 @@
 expectations:
+  - id: source-revision
+    expect: The installer reports its Git revision; a dirty suffix reflects changed installer inputs, not unrelated build-service files.
   - id: self-contained-build
     expect: The generated installer reproduces manifest-listed text files byte-for-byte without downloading payloads.
   - id: manifest-boundary
