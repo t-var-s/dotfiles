@@ -1,0 +1,3 @@
+# id	source	home-relative destination	validator	minimum version
+vim	.vimrc	.vimrc	vim	7.4
+tmux	.tmux.conf	.tmux.conf	tmux	2.1

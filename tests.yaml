@@ -1,0 +1,34 @@
+expectations:
+  - id: self-contained-build
+    expect: The generated installer reproduces manifest-listed text files byte-for-byte without downloading payloads.
+  - id: manifest-boundary
+    expect: New generic dotfiles require a manifest entry; web assets stay outside the installer and publish under /web/.
+  - id: manifest-validation
+    expect: Invalid paths, duplicate IDs, overlapping destinations, reserved backup paths, NUL bytes and unterminated text are rejected.
+  - id: clean-build
+    expect: A rebuild removes stale generated web assets and refuses to delete an unrecognized dist directory or a symlink.
+  - id: interactive-pipe
+    expect: Piped installation reads answers from the controlling terminal and writes nothing to the home directory without confirmation.
+  - id: interrupted-download
+    expect: A script truncated before its final entry point makes no installation changes.
+  - id: compatibility
+    expect: Missing or unsupported applications skip their own file without preventing other supported files from being selected.
+  - id: candidate-validation
+    expect: Invalid Vim or tmux configurations are skipped before any destination replacement.
+  - id: repeat-install
+    expect: Identical configurations produce no changes, prompts or new backups; a changed payload offers an update.
+  - id: safe-destinations
+    expect: Symlink destinations or parents, directories and other non-file destinations are never replaced or followed.
+  - id: concurrent-edit
+    expect: Edits detected between review and replacement abort installation and preserve the user's changed bytes.
+  - id: backups
+    expect: All originals are backed up before replacement; existing permissions remain and new files are mode 0600.
+  - id: restore
+    expect: Restoration recovers original bytes and permissions, moves newly installed files into backup, and is repeatable.
+  - id: protect-later-edits
+    expect: Restoration refuses to overwrite local modifications made after installation.
+  - id: partial-failure
+    expect: A failure during replacement reports a restore command capable of undoing completed changes.
+  - id: target-machine-validation
+    expect: Actual Vim 7.4 and tmux 2.1 binaries on target machines accept the configs and their key bindings behave as documented.
+    status: pending

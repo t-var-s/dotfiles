@@ -1,6 +1,12 @@
 " Use Vim defaults before applying custom settings and mappings.
 set nocompatible
 
+" This file and its PT-PT mappings are UTF-8, including on older systems.
+if has('multi_byte')
+  set encoding=utf-8
+endif
+scriptencoding utf-8
+
 " Configure the leader key with ç and 
 " use it to access {[]}
 let mapleader ="ç"
@@ -45,7 +51,13 @@ noremap <Leader>i0 ci}
 noremap <Leader>v ^v$
 
 "Use same clipboard as macOS/Linux
-set clipboard=unnamed,unnamedplus 
+if has('clipboard')
+  if has('unnamedplus')
+    set clipboard=unnamed,unnamedplus
+  else
+    set clipboard=unnamed
+  endif
+endif
 "add /g to every replacement by default
 set gdefault
 " Better command-line completion
