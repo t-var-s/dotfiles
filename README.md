@@ -1,5 +1,3 @@
-# Dotfiles
-
 Personal configuration oriented towards:
 - portable backward-compatible vim and tmux
 - keyboard layout in PT-PT with ç leader key
@@ -111,7 +109,10 @@ directory blank. The committed `netlify.toml` sets:
 - Publish directory: `dist`
 
 A push to `main` builds a complete installer from that revision and publishes it
-at `/install.sh`. Browser assets are served at `/web/<filename>`. `dist/` is
+at `/install.sh`, except when only the root `README.md` changed. Those updates
+skip the build and leave the currently published installer in place. Any other
+file change builds normally; missing or unavailable comparison history also
+allows the build. Browser assets are served at `/web/<filename>`. `dist/` is
 generated during the build, so it is not committed. No homepage is generated;
 the root URL may return 404 while `/install.sh` works correctly.
 
