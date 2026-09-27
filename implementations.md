@@ -19,6 +19,11 @@ the previous generated directory, validates canonical cleanup targets and
 sentinels, and copies Git-tracked `web/` assets into a separate `/web/` namespace.
 Remote installation needs no Git checkout or subsequent network request.
 
+Netlify's ignore command compares `CACHED_COMMIT_REF` with `COMMIT_REF`, excluding
+only the root `README.md`. A README-only change (or no effective change) skips
+the build. Any other change, including new paths, triggers it. Missing references
+or Git comparison failures explicitly return 1 so deployment can proceed.
+
 The runtime targets Bash 3.2, Vim 7.4 and tmux 2.1. Vim settings guard clipboard
 features and declare UTF-8 encoding. Version checks precede candidate validation.
 Vim loads the candidate without user plugins, swap or viminfo; validation also

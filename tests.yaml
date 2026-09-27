@@ -1,4 +1,6 @@
 expectations:
+  - id: readme-only-build-skip
+    expect: Netlify skips root README-only changes; other changes and missing or invalid comparison history allow the build.
   - id: source-revision
     expect: The installer reports its Git revision; a dirty suffix reflects changed installer inputs, not unrelated build-service files.
   - id: self-contained-build

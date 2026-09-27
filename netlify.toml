@@ -1,6 +1,13 @@
 [build]
   command = "bash scripts/build.sh"
   publish = "dist"
+  # Exit 0 skips the build; missing history or any other change builds normally.
+  ignore = '''
+    if [ -n "${CACHED_COMMIT_REF:-}" ] && [ -n "${COMMIT_REF:-}" ]; then
+      git diff --quiet "$CACHED_COMMIT_REF" "$COMMIT_REF" -- . ':(top,exclude)README.md' && exit 0
+    fi
+    exit 1
+  '''
 
 [[headers]]
   for = "/install.sh"
