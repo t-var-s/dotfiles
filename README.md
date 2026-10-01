@@ -4,11 +4,18 @@ Personal configuration oriented towards:
 - yazi-inspired netrw file browsing
 - decent markdown UX with tmux centered layout
 
-Compatibility targets: **Vim 7.4+**, **tmux 2.1+**, and **Bash 3.2+**.
+Compatibility targets: **Vim 7.4+**, **tmux 1.8+**, and **Bash 3.2+**.
 The installer checks the applications actually installed, rather than assuming
 capabilities from an OS name. It installs configuration only, without sudo,
 package installation, or changes to running Vim/tmux sessions. Use a UTF-8
 terminal for the PT-PT mappings.
+
+Tmux selects mouse settings supported by its version. `prefix-m` creates
+an approximately 20% / 60% / 20% workspace only in a single-pane window, keeping
+the existing shell active in the middle and inheriting its directory for the
+new panes. `prefix-z` toggles pane zoom; `prefix-h/j/k/l` navigates panes and
+`prefix-r` reloads the configuration. On 1.8, selecting a pane with the mouse
+also passes the click to the application.
 
 ## Install or update
 
@@ -122,11 +129,16 @@ the root URL may return 404 while `/install.sh` works correctly.
 bash scripts/build.sh
 shellcheck -s bash scripts/build.sh installer/install.sh installer/restore.sh dist/install.sh
 python3 tests/test_installer.py
+python3 tests/test_tmux.py
 ```
 
 The integration tests use Python's standard library and real Vim/tmux binaries,
 with temporary homes and a pseudo-terminal to exercise `cat install.sh | bash`.
 They also simulate older/missing applications and installation failures. Tests
 must not run against your real home directory. Minimum-version execution on
-Vim 7.4 and tmux 2.1 remains a target-machine validation step; a version check
+Vim 7.4 and tmux 1.8 remains a target-machine validation step; a version check
 alone is not evidence that those old binaries were tested.
+
+The tmux tests exercise real key bindings through an attached terminal in a
+separate server and temporary home. To check another existing tmux binary, run
+`TMUX_BINARY=/path/to/tmux python3 tests/test_tmux.py`.

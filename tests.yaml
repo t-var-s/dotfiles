@@ -17,8 +17,18 @@ expectations:
     expect: A script truncated before its final entry point makes no installation changes.
   - id: compatibility
     expect: Missing or unsupported applications skip their own file without preventing other supported files from being selected.
+  - id: tmux-minimum-version
+    expect: The installer accepts tmux 1.8 and newer, and skips tmux 1.7 and older before candidate validation.
+  - id: tmux-mouse
+    expect: tmux 1.8-2.0 enables legacy pane selection, resizing, window selection and copy-mode mouse options; 2.1+ enables the unified mouse option without unknown-option errors.
+  - id: tmux-centered-workspace
+    expect: prefix-m creates three horizontal panes at approximately 20/60/20 in a single-pane window, preserves the original shell and focus in the middle, and starts both new shells in its current directory, including paths containing spaces or quotes. Repeating it or invoking it in an existing multi-pane window leaves the panes and layout unchanged.
+  - id: tmux-key-bindings
+    expect: Reload, h/j/k/l pane navigation and prefix-z zoom work on tmux 1.8 and current tmux; reloading does not create panes or change the layout.
   - id: candidate-validation
     expect: Invalid Vim or tmux configurations are skipped before any destination replacement.
+  - id: netrw-open-compatibility
+    expect: In netrw v149 and current netrw, l expands a directory in tree view and opens a file with spaces in its name in a new tab. The initial netrw buffer maps Enter to search; reapplying its FileType mappings preserves the opening action on l.
   - id: repeat-install
     expect: Identical configurations produce no changes, prompts or new backups; a changed payload offers an update.
   - id: safe-destinations
@@ -34,5 +44,5 @@ expectations:
   - id: partial-failure
     expect: A failure during replacement reports a restore command capable of undoing completed changes.
   - id: target-machine-validation
-    expect: Actual Vim 7.4 and tmux 2.1 binaries on target machines accept the configs and their key bindings behave as documented.
+    expect: Actual Vim 7.4 and tmux 1.8 binaries on target machines accept the configs and their key bindings behave as documented.
     status: pending

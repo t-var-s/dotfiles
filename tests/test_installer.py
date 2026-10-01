@@ -249,6 +249,42 @@ class InstallerTests(unittest.TestCase):
         self.assert_installed(".vimrc")
         self.assertFalse((self.home / ".tmux.conf").exists())
 
+    def test_tmux_minimum_version_boundary(self):
+        # Fake the installer's initial version check; validation and the config's
+        # version-dependent commands use the real binary's version afterward.
+        real_tmux = shutil.which("tmux")
+        original_home = self.home
+        try:
+            for version in ("1.7", "1.8"):
+                with self.subTest(version=version):
+                    self.home = original_home / version
+                    self.home.mkdir()
+                    fake_bin = self.home.parent / ("bin-" + version)
+                    fake_bin.mkdir()
+                    fake_tmux = fake_bin / "tmux"
+                    banner_read = shlex.quote(str(fake_bin / "banner-read"))
+                    fake_tmux.write_text(
+                        f'#!/bin/sh\nif [ "$1" = "-V" ] && [ ! -e {banner_read} ]; then\n'
+                        f'  : > {banner_read}\n'
+                        f'  printf "tmux {version}\\n"\nelse\n'
+                        f'  exec {shlex.quote(real_tmux)} "$@"\nfi\n'
+                    )
+                    fake_tmux.chmod(0o755)
+                    answers = ["y", "y"] if version == "1.7" else ["n", "y", "y"]
+                    status, output = self.install(answers, env_extra={
+                        "PATH": str(fake_bin) + ":" + os.environ["PATH"]
+                    })
+                    self.assertEqual(status, 0, output)
+                    if version == "1.7":
+                        self.assertIn("requires 1.8 or newer", output)
+                        self.assert_installed(".vimrc")
+                        self.assertFalse((self.home / ".tmux.conf").exists())
+                    else:
+                        self.assertIn("tmux 1.8 (minimum 1.8)", output)
+                        self.assert_installed(".tmux.conf")
+        finally:
+            self.home = original_home
+
     def test_partial_replacement_failure_can_be_restored(self):
         original = b'" original local file\n'
         (self.home / ".vimrc").write_bytes(original)
