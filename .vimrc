@@ -155,7 +155,17 @@ augroup netrw_mappings
 augroup END
 function! s:NetrwMappings()
   " yazi-style navigation
-  nmap <buffer> l <Plug>NetrwLocalBrowseCheck
+  if !empty(maparg('<Plug>NetrwLocalBrowseCheck', 'n'))
+    nmap <buffer> l <Plug>NetrwLocalBrowseCheck
+  else
+    " Older netrw (including v149) maps Enter directly, without this <Plug>.
+    " Preserve its script ID when copying the action before Enter becomes search.
+    let l:open = maparg('<CR>', 'n', 0, 1)
+    if get(l:open, 'buffer', 0) && get(l:open, 'rhs', '') =~# 'netrw#LocalBrowseCheck'
+      let l:rhs = substitute(l:open.rhs, '\c<SID>', '<SNR>' . l:open.sid . '_', 'g')
+      execute 'nnoremap <buffer> <silent> l ' . l:rhs
+    endif
+  endif
   nmap <buffer> h -
   nmap <buffer> . gh
   " Enter starts search, as it does elsewhere in Vim.
